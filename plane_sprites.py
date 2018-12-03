@@ -1,6 +1,6 @@
 import random
 import pygame
-from constants import SCREEN_RECT
+from constants import SCREEN_RECT, HERO_FIRE_EVENT
 
 
 class GameSprite(pygame.sprite.Sprite):
@@ -38,3 +38,33 @@ class Enemy(GameSprite):
         super().update()
         if self.rect.y >= SCREEN_RECT.height:
             self.kill()
+
+
+class Bullet(GameSprite):
+    def __init__(self):
+        super().__init__('./images/bullet1.png', -2)
+
+    def update(self):
+        super().update()
+        if self.rect.y <= 0:
+            self.kill()
+
+
+class Hero(GameSprite):
+    def __init__(self):
+        super().__init__('./images/me1.png', 0)
+        self.rect.centerx = SCREEN_RECT.centerx
+        self.rect.bottom = SCREEN_RECT.bottom - 120
+        self.bullet_group = pygame.sprite.Group()
+
+    def update(self):
+        if (self.rect.x <= 0 and self.speed < 0) or (self.rect.right >= SCREEN_RECT.width and self.speed > 0):
+            return
+        self.rect.x += self.speed
+
+    def fire(self):
+        for i in (0, 1, 2):
+            bullet = Bullet()
+            bullet.rect.centerx = self.rect.centerx
+            bullet.rect.bottom = self.rect.top - i * 20
+            self.bullet_group.add(bullet)
